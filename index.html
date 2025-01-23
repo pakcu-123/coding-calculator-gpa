@@ -5,78 +5,181 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GPA Calculator</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin: 20px 0;
         }
         table, th, td {
             border: 1px solid black;
         }
         th, td {
+            text-align: center;
             padding: 8px;
-            text-align: left;
         }
         th {
             background-color: #f2f2f2;
         }
+        .input-group {
+            margin: 10px 0;
+        }
+        .input-group label {
+            display: inline-block;
+            width: 120px;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
-    <h2>GPA Calculator</h2>
-    <p>Author: [pakcu carlos]</p>
-    <table>
-        <tr>
-            <th>Index</th>
-            <th>Subject</th>
-            <th>Credit</th>
-            <th>Score</th>
-            <th>Grade</th>
-            <th>Point</th>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td>[Subject Name]</td>
-            <td>[Credit Hours]</td>
-            <td>[Score]</td>
-            <td>[Grade]</td>
-            <td>[Point]</td>
-        </tr>
-        <tr>
-            <td>2</td>
-            <td>[Subject Name]</td>
-            <td>[Credit Hours]</td>
-            <td>[Score]</td>
-            <td>[Grade]</td>
-            <td>[Point]</td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>[Subject Name]</td>
-            <td>[Credit Hours]</td>
-            <td>[Score]</td>
-            <td>[Grade]</td>
-            <td>[Point]</td>
-        </tr>
-        <tr>
-            <td>4</td>
-            <td>[Subject Name]</td>
-            <td>[Credit Hours]</td>
-            <td>[Score]</td>
-            <td>[Grade]</td>
-            <td>[Point]</td>
-        </tr>
-        <tr>
-            <td>5</td>
-            <td>[Subject Name]</td>
-            <td>[Credit Hours]</td>
-            <td>[Score]</td>
-            <td>[Grade]</td>
-            <td>[Point]</td>
-        </tr>
-    </table>
-    <h3>Calculation Verification:</h3>
-    <p>Total Quality Points: [Total Quality Points]</p>
-    <p>Total Credits: [Total Credits]</p>
-    <p>GPA: [GPA]</p>
+    <h1>GPA Calculator</h1>
+    <h2>Author: [pakcu carlos]</h2>
+    <div id="form-section">
+        <h3>Enter Subject Details:</h3>
+        <div id="subject-forms">
+            <!-- Subject forms will be dynamically added here -->
+        </div>
+        <button onclick="calculateGPA()">Calculate GPA</button>
+    </div>
+    <div id="result-section" style="display:none;">
+        <h3>Calculation Results:</h3>
+        <p id="gpa-summary"></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th>Subject</th>
+                    <th>Credit</th>
+                    <th>Score</th>
+                    <th>Grade</th>
+                    <th>Point</th>
+                </tr>
+            </thead>
+            <tbody id="results-table">
+                <!-- Results will be dynamically populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const SIZE = 5; // Fixed number of subjects
+        const subjectForms = document.getElementById("subject-forms");
+
+        // Dynamically generate form inputs for each subject
+        for (let i = 0; i < SIZE; i++) {
+            const formGroup = document.createElement("div");
+            formGroup.className = "input-group";
+            formGroup.innerHTML = `
+                <h4>Subject ${i + 1}</h4>
+                <label>Subject Name:</label>
+                <input type="text" id="subject-${i}" required><br>
+                <label>Credit Hours (1-4):</label>
+                <input type="number" id="credit-${i}" min="1" max="4" required><br>
+                <label>Score (0-100):</label>
+                <input type="number" id="score-${i}" min="0" max="100" required><br>
+            `;
+            subjectForms.appendChild(formGroup);
+        }
+
+        function calculateGPA() {
+            const subjects = [];
+            const credits = [];
+            const scores = [];
+            const grades = [];
+            const points = [];
+
+            for (let i = 0; i < SIZE; i++) {
+                const subject = document.getElementById(`subject-${i}`).value;
+                const credit = parseInt(document.getElementById(`credit-${i}`).value);
+                const score = parseFloat(document.getElementById(`score-${i}`).value);
+
+                if (!subject || isNaN(credit) || isNaN(score)) {
+                    alert("Please fill out all fields correctly.");
+                    return;
+                }
+
+                subjects.push(subject);
+                credits.push(credit);
+                scores.push(score);
+
+                if (score >= 80) {
+                    grades.push("A");
+                    points.push(4.0);
+                } else if (score >= 75) {
+                    grades.push("A-");
+                    points.push(3.7);
+                } else if (score >= 70) {
+                    grades.push("B+");
+                    points.push(3.3);
+                } else if (score >= 65) {
+                    grades.push("B");
+                    points.push(3.0);
+                } else if (score >= 60) {
+                    grades.push("B-");
+                    points.push(2.7);
+                } else if (score >= 55) {
+                    grades.push("C+");
+                    points.push(2.3);
+                } else if (score >= 50) {
+                    grades.push("C");
+                    points.push(2.0);
+                } else if (score >= 45) {
+                    grades.push("C-");
+                    points.push(1.7);
+                } else if (score >= 40) {
+                    grades.push("D");
+                    points.push(1.0);
+                } else {
+                    grades.push("F");
+                    points.push(0.0);
+                }
+            }
+
+            // Calculate GPA
+            let totalQualityPoints = 0;
+            let totalCredits = 0;
+
+            for (let i = 0; i < SIZE; i++) {
+                totalQualityPoints += points[i] * credits[i];
+                totalCredits += credits[i];
+            }
+
+            const gpa = totalQualityPoints / totalCredits;
+
+            // Display results
+            document.getElementById("form-section").style.display = "none";
+            const resultSection = document.getElementById("result-section");
+            resultSection.style.display = "block";
+            document.getElementById("gpa-summary").innerText = `Total Quality Points: ${totalQualityPoints.toFixed(2)}, Total Credits: ${totalCredits}, GPA: ${gpa.toFixed(2)}`;
+
+            const resultsTable = document.getElementById("results-table");
+            resultsTable.innerHTML = "";
+
+            for (let i = 0; i < SIZE; i++) {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td>${subjects[i]}</td>
+                    <td>${credits[i]}</td>
+                    <td>${scores[i].toFixed(2)}</td>
+                    <td>${grades[i]}</td>
+                    <td>${points[i].toFixed(2)}</td>
+                `;
+                resultsTable.appendChild(row);
+            }
+        }
+    </script>
 </body>
 </html>
+
